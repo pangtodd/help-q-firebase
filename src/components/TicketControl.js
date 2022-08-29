@@ -57,7 +57,7 @@ function TicketControl() {
     setSelectedTicket(null);
   };
 
-  const handleAddingNewTicketToList = (newTicket) => {
+  const handleAddingNewTicketToList = async (newTicketData) => {
     await addDoc(collection(db, "tickets"), newTicketData);
     setFormVisibleOnPage(false);
     // const newMainTicketList = mainTicketList.concat(newTicket);
