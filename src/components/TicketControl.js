@@ -59,9 +59,10 @@ function TicketControl() {
 
   const handleAddingNewTicketToList = (newTicket) => {
     await addDoc(collection(db, "tickets"), newTicketData);
+    setFormVisibleOnPage(false);
     // const newMainTicketList = mainTicketList.concat(newTicket);
     // setMainTicketList(newMainTicketList);
-    setFormVisibleOnPage(false);
+    
   };
 
   const handleChangingSelectedTicket = (id) => {
