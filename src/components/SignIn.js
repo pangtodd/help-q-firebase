@@ -1,10 +1,11 @@
 import React, { useState } from "react";
 import { auth } from "./../firebase.js";
-import { createUserWithEmailAndPassword, signInWithEmailandPassword } from "firebase/auth";
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from "firebase/auth";
 
 function SignIn(){
   const [signUpSuccess, setSignUpSuccess] =useState(null);
   const [signInSuccess, setSignInSuccess] = useState(null);
+  const [signOutSuccess, setSignOutSuccess] = useState(null);
 
   function doSignUp(event){
     event.preventDefault();
@@ -23,12 +24,20 @@ function SignIn(){
     event.preventDefault();
     const email = event.target.signinEmail.value;
     const password= event.target.signinPassword.value;
-    signInWithEmailandPassword(auth, email, password)
+    signInWithEmailAndPassword(auth, email, password)
       .then((userCredential)=>{
         setSignInSuccess(`You've done it! You're signed in as ${userCredential.user.email}!`)
       })
       .catch((error)=> {
         setSignInSuccess(`There was an error signing in: ${error.message}!`)
+      });
+  }
+  function doSignOut() {
+    signOut(auth)
+      .then(function() {
+        setSignOutSuccess("You have successfully signed out. Byeeeeeee!");
+      }).catch(function(error) {
+        setSignOutSuccess(`There was an error signing out: ${error.message}!`)
       });
   }
 
@@ -69,6 +78,11 @@ function SignIn(){
           <br></br>
           <button type='submit'>Submit!</button>
       </form>
+
+      <h1>Sign Out</h1>
+      {signOutSuccess}
+      <br />
+      <button onClick={doSignOut}>Sign out</button>
     </React.Fragment>
   );
 }
