@@ -28,13 +28,15 @@ function TicketControl() {
       (collectionSnapshot)=>{
         const tickets = [];
         collectionSnapshot.forEach((doc)=>{
-        tickets.push({
-          names: doc.data().names,
-          location: doc.data().location,
-          issue: doc.data().issue,
-          timeOpen: jsDate,
-          formattedWaitTime: formatDistanceToNow(jsDate),
-          id: doc.id
+          const timeOpen = doc.get('timeOpen', {serverTimestamps: "estimate"}).toDate();
+          const jsDate = new Date(timeOpen);
+          tickets.push({
+            names: doc.data().names,
+            location: doc.data().location,
+            issue: doc.data().issue,
+            timeOpen: jsDate,
+            formattedWaitTime: formatDistanceToNow(jsDate),
+            id: doc.id
         });
       });
         setMainTicketList(tickets);
