@@ -3,6 +3,7 @@ import NewTicketForm from "./NewTicketForm";
 import TicketList from "./TicketList";
 import EditTicketForm from "./EditTicketForm";
 import TicketDetail from "./TicketDetail";
+import { formatDistanceToNow } from "date-fns";
 import { db, auth } from './../firebase.js';
 import { collection, addDoc, onSnapshot, doc, updateDoc, deleteDoc } from "firebase/firestore";
 
@@ -31,6 +32,8 @@ function TicketControl() {
           names: doc.data().names,
           location: doc.data().location,
           issue: doc.data().issue,
+          timeOpen: jsDate,
+          formattedWaitTime: formatDistanceToNow(jsDate),
           id: doc.id
         });
       });
