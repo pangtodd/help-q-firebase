@@ -3,9 +3,10 @@ import NewTicketForm from "./NewTicketForm";
 import TicketList from "./TicketList";
 import EditTicketForm from "./EditTicketForm";
 import TicketDetail from "./TicketDetail";
-import { formatDistanceToNow } from "date-fns";
 import { db, auth } from './../firebase.js';
-import { collection, addDoc, onSnapshot, doc, updateDoc, deleteDoc } from "firebase/firestore";
+import { collection, addDoc, doc, updateDoc, onSnapshot, deleteDoc, query, orderBy } from "firebase/firestore";
+import { formatDistanceToNow } from 'date-fns';
+
 
 function TicketControl() {
   const [formVisibleOnPage, setFormVisibleOnPage] = useState(false);
@@ -22,6 +23,41 @@ function TicketControl() {
   //     editing: false
   //   };
   // }
+
+ 
+  useEffect(() => { 
+    // new code below!
+    const queryByTimestamp = query(
+      collection(db, "tickets"), 
+      orderBy('timeOpen')
+    );
+    const unSubscribe = onSnapshot(
+      // new code below!
+      queryByTimestamp, 
+      (querySnapshot) => {
+        const tickets = [];
+        querySnapshot.forEach((doc) => {
+          const timeOpen = doc.get('timeOpen', {serverTimestamps: "estimate"}).toDate();
+          const jsDate = new Date(timeOpen);
+          tickets.push({
+            names: doc.data().names, 
+            location: doc.data().location, 
+            issue: doc.data().issue, 
+            timeOpen: jsDate,
+            formattedWaitTime: formatDistanceToNow(jsDate),
+            id: doc.id
+          });
+        });
+        setMainTicketList(tickets);
+      },
+      (error) => {
+        setError(error.message);
+      }
+    );
+
+    return () => unSubscribe();
+  }, []);
+
   useEffect(() => {
     function updateTicketElapsedWaitTime() {
       const newMainTicketList = mainTicketList.map(ticket => {
@@ -40,32 +76,6 @@ function TicketControl() {
       clearInterval(waitTimeUpdateTimer);
     }
   }, [mainTicketList])
- 
-  useEffect(()=> {
-    const unSubscribe =onSnapshot(
-      collection(db,"tickets"),
-      (collectionSnapshot)=>{
-        const tickets = [];
-        collectionSnapshot.forEach((doc)=>{
-          const timeOpen = doc.get('timeOpen', {serverTimestamps: "estimate"}).toDate();
-          const jsDate = new Date(timeOpen);
-          tickets.push({
-            names: doc.data().names,
-            location: doc.data().location,
-            issue: doc.data().issue,
-            timeOpen: jsDate,
-            formattedWaitTime: formatDistanceToNow(jsDate),
-            id: doc.id
-        });
-      });
-        setMainTicketList(tickets);
-      },
-      (error)=> {
-        setError(error.message);
-      }
-    );
-    return ()=> unSubscribe();
-  },[]);
 
   const handleClick = () => {
     if (selectedTicket != null) {
@@ -110,8 +120,8 @@ function TicketControl() {
     setSelectedTicket(selection);
   };
 
-  let currentlyVisibleState = null;
-  let buttonText = null;
+  // let currentlyVisibleState = null;
+  // let buttonText = null;
   //should this be here?
 
     if (auth.currentUser == null) {

@@ -8,6 +8,7 @@ function Ticket(props){
       <div onClick = {() => props.whenTicketClicked(props.id)}>
         <h3>{props.location} - {props.names}</h3>
         <p><em>{props.issue}</em></p>
+        {/* new code below! */}
         <p><em>{props.formattedWaitTime}</em></p>
         <hr/>
       </div>
